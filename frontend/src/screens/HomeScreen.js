@@ -6,6 +6,7 @@ import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { useDispatch, useSelector } from 'react-redux'
 import { listProducts } from '../actions/productActions'
+import Paginate from '../components/Paginate'
 // import axios from 'axios'
 
 const HomeScreen = ({ match }) => {
@@ -22,13 +23,13 @@ const HomeScreen = ({ match }) => {
   //   }, [])
 
   const keyword = match.params.keyword
-
+  const pageNumber = match.params.pageNumber || 1
   const dispatch = useDispatch()
   const productList = useSelector((state) => state.productList)
   useEffect(() => {
-    dispatch(listProducts(keyword))
-  }, [dispatch, keyword])
-  const { loading, error, products } = productList
+    dispatch(listProducts(keyword, pageNumber))
+  }, [dispatch, keyword, pageNumber])
+  const { loading, error, products, page, pages } = productList
 
   return (
     <Fragment>
@@ -40,13 +41,20 @@ const HomeScreen = ({ match }) => {
       ) : error ? (
         <Message variant='danger' children={error} />
       ) : (
-        <Row>
-          {products.map((product) => (
-            <Col key={product._id} sm={12} md={6} lg={4}>
-              <Product product={product} />
-            </Col>
-          ))}
-        </Row>
+        <Fragment>
+          <Row>
+            {products.map((product) => (
+              <Col key={product._id} sm={12} md={6} lg={4}>
+                <Product product={product} />
+              </Col>
+            ))}
+          </Row>
+          <Paginate
+            pages={pages}
+            page={page}
+            keyword={keyword ? keyword : ''}
+          ></Paginate>
+        </Fragment>
       )}
     </Fragment>
   )
